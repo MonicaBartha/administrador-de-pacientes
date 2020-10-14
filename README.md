@@ -1,68 +1,97 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### Administrador de pacientes de clinica veterinaria
 
-## Available Scripts
+Proyecto creado con React Hooks.
+CSS con Normalize y Skeleton
+La app:
 
-In the project directory, you can run:
+- lee la informacion que el usuario ingresa
+- valida el formulario
+- cambia el estado de los inputs
+- reinicia el formulario
 
-### `yarn start`
+#### Proceso
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Componente Formulario que tiene su propio state
+  <input 
+                    type="text"
+                    name="mascota"
+                    className="u-full-width"
+                    placeholder="Nombre Mascota"
+                    onChange={actualizarState}
+                    value={mascota}
+                />
+- Creando state para citas
+  El valor name={mascota} se usa en el state que inicia con un string vacio.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+                const [cita, actualizarCita] = useState({
+                    mascota: '',
+                    propietario: '',
+                    fecha: '',
+                    hora: '',
+                    sintomas: ''
+                });
 
-### `yarn test`
+La función que actualiza el state se usa con un evento como onChange
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+                const actualizarState = e => {
+                actualizarCita({
 
-### `yarn build`
+                        })
+                    }
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Recuperar la info que el usuario agrega en los inputs
+  se usa un evento **e** que trae la información,
+  por ejemplo **e.target.name** trae el nombre de la mascota
+  **e.target.value** el valor que ingresa el usuario en el input
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+                  const actualizarState = e => {
+                      actualizarCita({
+                          ...cita,
+                          [e.target.name] : e.target.value
+                      })
+                  }
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  - Array destructuring para que la informacion se inscriba corectamente al input correspondiente:
+    [e.target.name] : e.target.value
 
-### `yarn eject`
+  - Hay que agregar una **copia del state** para que se guarde toda la info, si no cuando se escribe en el segundo input, se reemplaza la informacion del primer input, no se guarda.
+    **...cita**
+    La informacion se extrae utilizando **destructuring**
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+**const { mascota, propietario, fecha, hora, sintomas } = cita;**
+se relaciona a los inputs a traves de value={mascota}, etc
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Evento para leer cuando el usuario envie el formulario, boton **Agregar cita**
+  La funcion **onSubmit={submitCita}** se agrega dentro del tag <form>.
+  A la funcion se agrega el evento preventDefault para eliminar del link el query string que se evia by default:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+                const submitCita = e => {
+                    e.preventDefault(); }
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- Validación de formulario
+  **.trim** asegura que los campos no están enviados vacios.
+  Siempre en la validación hay que colocar un **return** para que no se continue ejecutando el código. Si hay input vacios, va marcar un error:
 
-## Learn More
+                  if( mascota.trim() === '' || propietario.trim() === '' || fecha.trim() === '' ||
+                          hora.trim() === '' || sintomas.trim() === '') {
+                              // funcion del State del error
+                              actualizarError(true);
+                              return;
+                          }
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Para que el error sea visible para usuario, se agrega un state del error:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+                const [ error, actualizarError ] = useState(false)
 
-### Code Splitting
+Al iniciar el formulario, el state es false porque no hay errores.
+En caso que falla va validacion, se ejecuta **actualizarError(true);** y se muestra el mensaje:
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+                { error ? <p className="alerta-error">Todos los campos son obligatorios</p>
+                            : null}
 
-### Analyzing the Bundle Size
+Despues de enviar en formulario, se debe reiniciar:
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+                actualizarError(false);
 
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+- Asignando un ID (key) a las citas
+  Se instala la libreria **uuid**
