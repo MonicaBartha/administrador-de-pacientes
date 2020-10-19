@@ -1,6 +1,6 @@
 ### Administrador de pacientes de clinica veterinaria
 
-Link deploy: https://pacientes-veterinarios.netlify.app/
+Link deploy: https://pacientes-veterinarios.netlify.app/ <br>
 Proyecto creado con React Hooks. <br>
 CSS con Normalize y Skeleton <br>
 La app:
@@ -97,21 +97,24 @@ Despues de enviar en formulario, se deben vaciar los inputs:
 
                 actualizarError(false);
 
-5. Asignando un ID (key) a las citas<br>
-   Se instala la libreria **uuid** para que cada elemento tenga un key único.
-   cita.id = uuid();
+5.  Asignando un ID (key) a las citas<br>
+    Se instala la libreria **uuid** para que cada elemento tenga un key único.
+    cita.id = uuid();
 
-6. Creando un state principal en App.js de todas las citas, inicia con un arreglo vacio.
-   const [citas, guardarCitas] = useState([]);
+6.  Creando un state principal en App.js de todas las citas, inicia con un arreglo vacio.
+
+                const [citas, guardarCitas] = useState([]);
 
 - creamos la funcion **crearCita()** que tome las citas actuales y agregue la nueva
 - la funcion se pasa al componente Formulario como props
-  <Formulario 
+
+                <Formulario
                   crearCita={crearCita}
                   />
-  En el componente Formulario la funcion se pasa a traves del destructuring <br>
-  const Formulario = **({crearCita})** => {
 
+  En el componente Formulario la funcion se pasa a traves del destructuring <br>
+
+                const Formulario = **({crearCita})** => {
                 crearCita(cita);
 
 7.  Reiniciar el form
