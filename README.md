@@ -9,6 +9,9 @@ La app:
 - valida el formulario
 - cambia el estado de los inputs
 - reinicia el formulario
+- muestra las citas
+- opción para eliminar citas
+- guarda las citas en el localStorage
 
 #### Proceso
 
