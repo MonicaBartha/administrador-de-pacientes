@@ -1,5 +1,6 @@
 ### Administrador de pacientes de clinica veterinaria
 
+Link deploy: https://pacientes-veterinarios.netlify.app/
 Proyecto creado con React Hooks. <br>
 CSS con Normalize y Skeleton <br>
 La app:
@@ -64,7 +65,7 @@ La función que actualiza el state se usa con un evento como **onChange**
 
 Las variables se relacionan a los inputs a traves de **value={mascota}**, etc
 
-3.  Evento para leer cuando el usuario envie el formulario, boton **Agregar cita**
+3.  Evento para leer cuando el usuario envie el formulario, boton **Agregar cita**<br>
     La funcion **onSubmit={submitCita}** se agrega dentro del tag form.
     A la funcion se agrega el evento **preventDefault** para eliminar del link el query string que se evia by default:
 
@@ -92,9 +93,92 @@ En caso que falla va validacion, se ejecuta **actualizarError(true);** y se mues
                 { error ? <p className="alerta-error">Todos los campos son obligatorios</p>
                             : null}
 
-Despues de enviar en formulario, se debe reiniciar:
+Despues de enviar en formulario, se deben vaciar los inputs:
 
                 actualizarError(false);
 
 5. Asignando un ID (key) a las citas<br>
-   Se instala la libreria **uuid** para que cada elemento tenga un elemento único.
+   Se instala la libreria **uuid** para que cada elemento tenga un key único.
+   cita.id = uuid();
+
+6. Creando un state principal en App.js de todas las citas, inicia con un arreglo vacio.
+   const [citas, guardarCitas] = useState([]);
+
+- creamos la funcion **crearCita()** que tome las citas actuales y agregue la nueva
+- la funcion se pasa al componente Formulario como props
+  <Formulario 
+                  crearCita={crearCita}
+                  />
+  En el componente Formulario la funcion se pasa a traves del destructuring <br>
+  const Formulario = **({crearCita})** => {
+
+                crearCita(cita);
+
+7.  Reiniciar el form
+
+                actualizarCita({
+                        mascota: '',
+                        propietario: '',
+                        fecha: '',
+                        hora: '',
+                        sintomas: ''
+                })
+
+8.  Mostrar el listado de citas<br>
+    se utiliza un **.map** para iterar sobre las citas, después se llama el componente **Cita** donde se extrae toda la información de la cita: mascota, dueño, etc.
+    <p>Mascota: <span>{cita.mascota}</span></p>
+    <p>Dueño: <span>{cita.propietario}</span></p>
+    <p>Fecha: <span>{cita.fecha}</span></p>
+    <p>Hora: <span>{cita.hora}</span></p>
+    <p>Síntomas: <span>{cita.sintomas}</span></p>
+
+9.  Eliminar citas <br>
+    Dentro del componente Cita se crea el boton Eliminar Cita.<br>
+    Dentro de **App.js** se crea una función que elimina una cita por su ID. Esta función se agrega como props al componente Cita. La función usa un **.filter** que itera por todas las citas y que quede solo las citas que no tienen el id eliminado.
+
+                    const eliminarCita = id => {
+                        const nuevasCitas = citas.filter(cita => cita.id !== id );
+                        guardarCitas(nuevasCitas);
+                    }
+
+                    <button
+                        onClick={ () => eliminarCita(cita.id)}
+                        className="button eliminar u-full-width"
+                        >Eliminar &times;
+                    </button>
+
+10. Mensaje condicional <br>
+    Se usa va variable titulo con un operador ternario: Si no hay citas (**citas.length === 0**), se muestra el mensaje "No hay citas", si hay cita se muestra "Administra tus citas". En App.js:
+
+                    const titulo = citas.length === 0 ? 'No hay citas' : 'Administra tus Citas';
+
+11. Agregar las citas en **localStorage**<br>
+    Se usa **useEffect** para realizar operaciones cuando el state cambia.<br>
+    **useEffect = componentDidMount y componentDidUpdate**<br>
+    Local Storage almacena solo **strings**.<br>
+    Se revisa si no hay citas (state inicial). En caso de que no, inicia con un arreglo vacio.<br>
+
+                    let citasIniciales = JSON.parse(localStorage.getItem('citas'));
+                    if(!citasIniciales) {
+                        citasIniciales = [];
+                        }
+
+**JSON.parse** transforma la informacion en **string**.<br>
+**citasIniciales** pasa ser el state inicial:<br>
+
+                const [citas, guardarCitas] = useState(citasIniciales);
+
+                useEffect( () => {
+                    let citasIniciales = JSON.parse(localStorage.getItem('citas'));
+                    if(citasIniciales) {
+                        localStorage.setItem('citas', JSON.stringify(citas))
+                    } else {
+                        localStorage.setItem('citas', JSON.stringify([]));
+                    }
+                    }, [citas] );
+
+12. Agregar PropTypes en el componente Cita y Formulario.<br>
+
+                Formulario.propTypes = {
+                    crearCita: PropTypes.func.isRequired
+                }
